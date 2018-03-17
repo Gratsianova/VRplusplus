@@ -1,0 +1,293 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="style.css" type="text/css"/>
+	<script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/90/three.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenMax.min.js"></script>
+</head>
+</head>
+<body>
+	<div id="wrapper">
+		<input type="text" id="textinput" placeholder="Тут текст"/>
+
+		<button id="submit">Результат</button>
+	</div>
+<script src="script.js"></script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="style.css" type="text/css"/>
+	<script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/90/three.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenMax.min.js"></script>
+<!-- three.js library -->
+<script src='three.min.js'></script>
+<script src='stats.min.js'></script>
+<!-- ar.js -->
+<script src="ar.js"></script>
+<script>THREEx.ArToolkitContext.baseURL = '../'</script>
+<!-- Bind window error for error handling -->
+<script>
+  window.addEventListener('error', function(event) {
+    alert("ERROR: " + event.message + " at " + event.filename + " : " + event.lineno + " : " + event.colno);
+  });
+</script>
+
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'><div style='position: absolute; top: 10px; width:100%; text-align: center;z-index:1';>
+	
+
+	<div id="wrapper">
+		<input type="text" id="textinput" placeholder="Тут текст"/>
+
+		<button id="submit">Результат</button>
+	</div>
+
+
+<script>
+  //////////////////////////////////////////////////////////////////////////////////
+  //    Init
+  //////////////////////////////////////////////////////////////////////////////////
+
+  // init renderer
+  var renderer  = new THREE.WebGLRenderer({
+    // antialias  : true,
+    alpha: true
+  });
+  renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+  // renderer.setPixelRatio( 2 );
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.domElement.style.position = 'absolute'
+  renderer.domElement.style.top = '0px'
+  renderer.domElement.style.left = '0px'
+  document.body.appendChild( renderer.domElement );
+
+  // array of functions for the rendering loop
+  var onRenderFcts= [];
+
+  // init scene and camera
+  var scene = new THREE.Scene();
+
+  //////////////////////////////////////////////////////////////////////////////////
+  //    Initialize a basic camera
+  //////////////////////////////////////////////////////////////////////////////////
+
+  // Create a camera
+  var camera = new THREE.Camera();
+  scene.add(camera);
+
+  ////////////////////////////////////////////////////////////////////////////////
+  //          handle arToolkitSource
+  ////////////////////////////////////////////////////////////////////////////////
+
+  var artoolkitProfile = new THREEx.ArToolkitProfile()
+  artoolkitProfile.sourceWebcam()
+  // artoolkitProfile.sourceVideo(THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4').kanjiMarker();
+  // artoolkitProfile.sourceImage(THREEx.ArToolkitContext.baseURL + '../data/images/img.jpg').hiroMarker()
+
+  var arToolkitSource = new THREEx.ArToolkitSource(artoolkitProfile.sourceParameters)
+
+  arToolkitSource.init(function onReady(){
+    onResize()
+  })
+
+  // handle resize
+  window.addEventListener('resize', function(){
+    onResize()
+  })
+  function onResize(){
+    arToolkitSource.onResize()
+    arToolkitSource.copySizeTo(renderer.domElement)
+    if( arToolkitContext.arController !== null ){
+      arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  //          initialize arToolkitContext
+  ////////////////////////////////////////////////////////////////////////////////
+
+  // create atToolkitContext
+  var arToolkitContext = new THREEx.ArToolkitContext(artoolkitProfile.contextParameters)
+  // initialize it
+  arToolkitContext.init(function onCompleted(){
+    // copy projection matrix to camera
+    camera.projectionMatrix.copy( arToolkitContext.getProjectionMatrix() );
+  })
+
+  // update artoolkit on every frame
+  onRenderFcts.push(function(){
+    if( arToolkitSource.ready === false ) return
+
+    arToolkitContext.update( arToolkitSource.domElement )
+  })
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  //          Create a ArMarkerControls
+  ////////////////////////////////////////////////////////////////////////////////
+
+  var markerGroup = new THREE.Group
+  scene.add(markerGroup)
+  var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerGroup, {
+    type : 'pattern',
+    patternUrl : THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro',
+  })
+
+
+  // build a smoothedControls
+  var smoothedGroup = new THREE.Group()
+  scene.add(smoothedGroup)
+  var smoothedControls = new THREEx.ArSmoothedControls(smoothedGroup)
+  onRenderFcts.push(function(delta){
+   smoothedControls.update(markerGroup)
+  })
+
+  //////////////////////////////////////////////////////////////////////////////////
+  //    add an object in the scene
+  //////////////////////////////////////////////////////////////////////////////////
+
+
+  var markerScene = new THREE.Scene()
+  markerGroup.add(markerScene)
+
+  // var mesh = new THREE.AxisHelper()
+  // markerScene.add(mesh)
+
+  // add a torus knot
+  // var geometry  = new THREE.CubeGeometry(1,1,1);
+  // var material  = new THREE.MeshNormalMaterial({
+  //   transparent : true,
+  //   opacity: 0.5,
+  //   side: THREE.DoubleSide
+  // });
+  // var mesh  = new THREE.Mesh( geometry, material );
+  // mesh.position.y = geometry.parameters.height/2
+  // markerScene.add(mesh)
+
+  // var geometry  = new THREE.TorusKnotGeometry(0.3,0.1,64,16);
+  // var material  = new THREE.MeshNormalMaterial();
+  // var mesh  = new THREE.Mesh( geometry, material );
+  // mesh.position.y = 0.5
+  // markerScene.add( mesh );
+
+  // CUSTOM CUBES START
+
+  	// make a cube
+	var geometry = new THREE.CubeGeometry( 0.6, 0.6, 0.6, 0.6 );
+	var materialYellow = new THREE.MeshPhongMaterial( {side: THREE.DoubleSide, color: 0xffdd33 } );
+	var materialBlack = new THREE.MeshPhongMaterial( {side: THREE.DoubleSide, color: 0x000000 } );
+	var materialWhite = new THREE.MeshPhongMaterial( {side: THREE.DoubleSide, color: 0xffffff } );
+
+	var group = new THREE.Object3D();
+	scene.add(group);
+
+	var cube1 = new THREE.Mesh( geometry, materialWhite );
+	group.add( cube1 );
+	cube1.position.set(-1.2, 0, 0);
+
+
+	var cube2 = new THREE.Mesh( geometry, materialYellow );
+	group.add( cube2 );
+	cube2.position.set(-0.3, 0.9, 0);
+
+	var cube3 = new THREE.Mesh( geometry, materialBlack );
+	group.add( cube3 );
+	cube3.position.set(-0.3, 0, 0);
+
+	var cube4 = new THREE.Mesh( geometry, materialBlack );
+	group.add( cube4 );
+	cube4.position.set(-0.3, -0.9, 0);
+
+	var cube5 = new THREE.Mesh( geometry, materialBlack );
+	group.add( cube5 );
+	cube5.position.set(0.6, 0, 0);
+
+	markerScene.add(group);
+var loader = new THREE.FontLoader();
+
+var font;
+loader.load( 'helvetiker_bold.typeface.json', function ( loadedFont ) {
+  font = loadedFont;
+} );
+
+
+
+  // CUSTOM CUBES END
+
+
+  // create a point light that shines from above
+var light = new THREE.PointLight(0xffffff, 5, 100);
+light.position.set(50, 50, 50);
+scene.add(light);
+
+// create ambient light that lights everything slightly
+var ambientLight = new THREE.AmbientLight(0xFFFFFF);
+scene.add(ambientLight);
+//end light
+
+  onRenderFcts.push(function(delta){
+    group.rotation.x += 0.01;
+  })
+
+  //////////////////////////////////////////////////////////////////////////////////
+  //    render the whole thing on the page
+  //////////////////////////////////////////////////////////////////////////////////
+  var stats = new Stats();
+  document.body.appendChild( stats.dom );
+  // render the scene
+  onRenderFcts.push(function(){
+    renderer.render( scene, camera );
+    stats.update();
+  })
+
+  // run the rendering loop
+  var lastTimeMsec= null
+  requestAnimationFrame(function animate(nowMsec){
+    // keep looping
+    requestAnimationFrame( animate );
+    // measure time
+    lastTimeMsec  = lastTimeMsec || nowMsec-1000/60
+    var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+    lastTimeMsec  = nowMsec
+    // call each update function
+    onRenderFcts.forEach(function(onRenderFct){
+      onRenderFct(deltaMsec/1000, nowMsec/1000)
+    })
+  })
+
+  document.getElementById('submit').onclick = function(e) {
+  var string = document.getElementById('textinput').value; 
+  console.log(string);
+
+        var selectedObject = scene.getObjectByName('text_name');
+        group.remove(selectedObject);
+        console.log(selectedObject);
+
+          var textgeometry = new THREE.TextGeometry(string, {
+            font: font,
+            size: 0.5,
+            height: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.2,
+            bevelSize: 0,
+            bevelSegments: 0,
+          } );
+
+        var text = new THREE.Mesh( textgeometry, materialBlack );
+        text.position.set(-0.6,-2.0,-0.2);
+
+        text.name= "text_name"
+        group.add(text);
+
+
+
+};
+</script></body>

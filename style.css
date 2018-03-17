@@ -1,0 +1,38 @@
+    
+    #wrapper{
+    height: 80px;
+    
+}
+
+   #textinput {
+    height: 80px;
+    width: 85%;
+    font-size: 35px;
+    font-family: helvetica, Arial, sans-serif;
+    font-weight: 600;
+    border: none;
+    display: inline-block;
+    padding: 0px;
+    text-align: center;
+}
+    
+    #textinput::-webkit-input-placeholder {
+    color: #aaa;
+   } 
+   #textinput::-moz-placeholder {
+    color: #aaa;
+   }
+
+     #submit {
+    height: 80px;
+    /* border-radius: 6px; */
+    width: 14%;
+    padding: 0;
+    align-items: left;
+    border: none;
+    background-color: #ffdd33;
+    display: inline-block;
+    font-size: 35px;
+    font-family: helvetica, Arial, sans-serif;
+    font-weight: 600;
+}
