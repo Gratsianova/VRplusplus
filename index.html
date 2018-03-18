@@ -29,7 +29,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenMax.min.js"></script>
 <!-- three.js library -->
 <script src='three.min.js'></script>
-<!-- <script src='stats.min.js'></script> -->
+<script src='stats.min.js'></script>
 <!-- ar.js -->
 <script src="ar.js"></script>
 <script>THREEx.ArToolkitContext.baseURL = 'https://gratsianova.github.io/VRplusplus/'</script>
@@ -239,28 +239,28 @@ scene.add(ambientLight);
   //////////////////////////////////////////////////////////////////////////////////
   //    render the whole thing on the page
   //////////////////////////////////////////////////////////////////////////////////
-  var stats = new Stats();
-  document.body.appendChild( stats.dom );
-  // render the scene
-  onRenderFcts.push(function(){
-    renderer.render( scene, camera );
-    stats.update();
-  })
+  // var stats = new Stats();
+  // document.body.appendChild( stats.dom );
+  // // render the scene
+  // onRenderFcts.push(function(){
+  //   renderer.render( scene, camera );
+  //   stats.update();
+  // })
 
-  // run the rendering loop
-  var lastTimeMsec= null
-  requestAnimationFrame(function animate(nowMsec){
-    // keep looping
-    requestAnimationFrame( animate );
-    // measure time
-    lastTimeMsec  = lastTimeMsec || nowMsec-1000/60
-    var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
-    lastTimeMsec  = nowMsec
-    // call each update function
-    onRenderFcts.forEach(function(onRenderFct){
-      onRenderFct(deltaMsec/1000, nowMsec/1000)
-    })
-  })
+  // // run the rendering loop
+  // var lastTimeMsec= null
+  // requestAnimationFrame(function animate(nowMsec){
+  //   // keep looping
+  //   requestAnimationFrame( animate );
+  //   // measure time
+  //   lastTimeMsec  = lastTimeMsec || nowMsec-1000/60
+  //   var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+  //   lastTimeMsec  = nowMsec
+  //   // call each update function
+  //   onRenderFcts.forEach(function(onRenderFct){
+  //     onRenderFct(deltaMsec/1000, nowMsec/1000)
+  //   })
+  // })
 
   document.getElementById('submit').onclick = function(e) {
   var string = document.getElementById('textinput').value; 
