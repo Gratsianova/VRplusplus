@@ -36,3 +36,19 @@
     font-family: helvetica, Arial, sans-serif;
     font-weight: 600;
 }
+
+
+
+@media only screen and (min-width: 600px)  {
+ 
+    #wrapper{
+    height: 160px;
+    
+}
+
+   #textinput {
+    height: 160px;
+
+}
+
+}
