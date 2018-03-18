@@ -29,7 +29,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenMax.min.js"></script>
 <!-- three.js library -->
 <script src='three.min.js'></script>
-<script src='stats.min.js'></script>
+<!-- <script src='stats.min.js'></script> -->
 <!-- ar.js -->
 <script src="ar.js"></script>
 <script>THREEx.ArToolkitContext.baseURL = 'https://gratsianova.github.io/VRplusplus/'</script>
@@ -239,55 +239,55 @@ scene.add(ambientLight);
   //////////////////////////////////////////////////////////////////////////////////
   //    render the whole thing on the page
   //////////////////////////////////////////////////////////////////////////////////
-  var stats = new Stats();
-  document.body.appendChild( stats.dom );
-  // render the scene
-  onRenderFcts.push(function(){
-    renderer.render( scene, camera );
-    stats.update();
-  })
+//   var stats = new Stats();
+//   document.body.appendChild( stats.dom );
+//   // render the scene
+//   onRenderFcts.push(function(){
+//     renderer.render( scene, camera );
+//     stats.update();
+//   })
 
-  // run the rendering loop
-  var lastTimeMsec= null
-  requestAnimationFrame(function animate(nowMsec){
-    // keep looping
-    requestAnimationFrame( animate );
-    // measure time
-    lastTimeMsec  = lastTimeMsec || nowMsec-1000/60
-    var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
-    lastTimeMsec  = nowMsec
-    // call each update function
-    onRenderFcts.forEach(function(onRenderFct){
-      onRenderFct(deltaMsec/1000, nowMsec/1000)
-    })
-  })
+//   // run the rendering loop
+//   var lastTimeMsec= null
+//   requestAnimationFrame(function animate(nowMsec){
+//     // keep looping
+//     requestAnimationFrame( animate );
+//     // measure time
+//     lastTimeMsec  = lastTimeMsec || nowMsec-1000/60
+//     var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+//     lastTimeMsec  = nowMsec
+//     // call each update function
+//     onRenderFcts.forEach(function(onRenderFct){
+//       onRenderFct(deltaMsec/1000, nowMsec/1000)
+//     })
+//   })
 
-  document.getElementById('submit').onclick = function(e) {
-  var string = document.getElementById('textinput').value; 
-  console.log(string);
+//   document.getElementById('submit').onclick = function(e) {
+//   var string = document.getElementById('textinput').value; 
+//   console.log(string);
 
-        var selectedObject = scene.getObjectByName('text_name');
-        group.remove(selectedObject);
-        console.log(selectedObject);
+//         var selectedObject = scene.getObjectByName('text_name');
+//         group.remove(selectedObject);
+//         console.log(selectedObject);
 
-          var textgeometry = new THREE.TextGeometry(string, {
-            font: font,
-            size: 0.5,
-            height: 0.2,
-            curveSegments: 12,
-            bevelEnabled: true,
-            bevelThickness: 0.2,
-            bevelSize: 0,
-            bevelSegments: 0,
-          } );
+//           var textgeometry = new THREE.TextGeometry(string, {
+//             font: font,
+//             size: 0.5,
+//             height: 0.2,
+//             curveSegments: 12,
+//             bevelEnabled: true,
+//             bevelThickness: 0.2,
+//             bevelSize: 0,
+//             bevelSegments: 0,
+//           } );
 
-        var text = new THREE.Mesh( textgeometry, materialBlack );
-        text.position.set(-0.6,-2.0,-0.2);
+//         var text = new THREE.Mesh( textgeometry, materialBlack );
+//         text.position.set(-0.6,-2.0,-0.2);
 
-        text.name= "text_name"
-        group.add(text);
+//         text.name= "text_name"
+//         group.add(text);
 
 
 
-};
+// };
 </script></body>
